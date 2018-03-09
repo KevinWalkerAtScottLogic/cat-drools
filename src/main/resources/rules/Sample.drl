@@ -1,0 +1,37 @@
+package com.sample
+ 
+import com.sample.DroolsTest.CatFact;
+
+rule "Cat is at risk"
+    when
+        m : CatFact( status == CatFact.SAFE )
+    then
+        m.setMessage( m.getHumanName() + " at Risk of Death" );
+        System.out.println(m.getMessage());
+        m.setStatus( CatFact.ATRISK );
+        update( m );
+end
+
+
+rule "Cats have many lives"
+salience 2
+    when
+        m: CatFact( status == CatFact.ATRISK, catLifeCount>0)
+    then
+        m.setMessage( m.getHumanName() +" Phew, lives remaining "); 
+        System.out.println(m.getMessage());
+        m.anotherLifeGone();
+        m.setStatus( CatFact.SAFE );
+        update( m );
+end
+
+rule "Cats eventually run out of lives"
+salience 2
+    when
+        m: CatFact( status == CatFact.ATRISK, catLifeCount == 0)
+    then
+        m.setMessage( m.getHumanName() +" ran out of luck " ); 
+        System.out.println( m.getMessage() );
+        m.setStatus(CatFact.DEAD);
+        update(m);
+end
